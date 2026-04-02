@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { supabase, Profile } from '../../lib/supabase';
+import { Profile } from '../../lib/supabase';
+import { dataService } from '../../lib/dataService';
 import { motion } from 'motion/react';
 import { 
   Users, 
@@ -21,21 +22,13 @@ export default function Dashboard() {
 
   useEffect(() => {
     async function fetchStats() {
-      const { count: studentCount } = await supabase.from('students').select('*', { count: 'exact', head: true });
-      const { count: teacherCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
-      
-      const today = new Date().toISOString().split('T')[0];
-      const { count: attendanceCount } = await supabase
-        .from('student_attendance')
-        .select('*', { count: 'exact', head: true })
-        .eq('date', today)
-        .eq('status', 'hadir');
+      const { studentCount, teacherCount, attendanceToday } = await dataService.getStats();
 
       setStats({
         totalStudents: studentCount || 0,
         totalTeachers: teacherCount || 0,
-        todayAttendance: attendanceCount || 0,
-        attendanceRate: studentCount ? Math.round(((attendanceCount || 0) / studentCount) * 100) : 0
+        todayAttendance: attendanceToday || 0,
+        attendanceRate: studentCount ? Math.round(((attendanceToday || 0) / studentCount) * 100) : 0
       });
     }
     fetchStats();

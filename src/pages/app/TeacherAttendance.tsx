@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { supabase, Profile, TeacherAttendance } from '../../lib/supabase';
+import { Profile, TeacherAttendance } from '../../lib/supabase';
+import { dataService } from '../../lib/dataService';
 import { motion } from 'motion/react';
 import { CheckCircle, Clock, AlertCircle, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
@@ -17,14 +18,10 @@ export default function TeacherAttendancePage() {
   useEffect(() => {
     async function fetchTodayAttendance() {
       if (!profile) return;
-      const { data } = await supabase
-        .from('teacher_attendance')
-        .select('*')
-        .eq('teacher_id', profile.id)
-        .eq('date', today)
-        .single();
+      const { data } = await dataService.getTeacherAttendance(profile.id);
       
-      setAttendance(data);
+      const todayRecord = data?.find((a: any) => a.date === today);
+      setAttendance(todayRecord || null);
       setLoading(false);
     }
     fetchTodayAttendance();
@@ -35,16 +32,12 @@ export default function TeacherAttendancePage() {
     setSubmitting(true);
     
     try {
-      const { data, error } = await supabase
-        .from('teacher_attendance')
-        .insert([{
-          teacher_id: profile.id,
-          date: today,
-          status,
-          check_in_time: new Date().toISOString()
-        }])
-        .select()
-        .single();
+      const { data, error } = await dataService.addTeacherAttendance({
+        teacher_id: profile.id,
+        date: today,
+        status,
+        check_in_time: new Date().toISOString()
+      });
 
       if (error) throw error;
       setAttendance(data);

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { supabase, Student } from '../../lib/supabase';
+import { Student } from '../../lib/supabase';
+import { dataService } from '../../lib/dataService';
 import { motion } from 'motion/react';
-import { Plus, Search, Edit2, Trash2, GraduationCap, X, Save } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, X, Save } from 'lucide-react';
 
 export default function StudentDataPage() {
   const [students, setStudents] = useState<Student[]>([]);
@@ -16,7 +17,7 @@ export default function StudentDataPage() {
   }, []);
 
   async function fetchStudents() {
-    const { data } = await supabase.from('students').select('*').order('name');
+    const { data } = await dataService.getStudents();
     if (data) setStudents(data);
     setLoading(false);
   }
@@ -27,15 +28,10 @@ export default function StudentDataPage() {
 
     try {
       if (editingStudent) {
-        const { error } = await supabase
-          .from('students')
-          .update(formData)
-          .eq('id', editingStudent.id);
+        const { error } = await dataService.updateStudent(editingStudent.id, formData);
         if (error) throw error;
       } else {
-        const { error } = await supabase
-          .from('students')
-          .insert([formData]);
+        const { error } = await dataService.addStudent(formData);
         if (error) throw error;
       }
       
@@ -54,7 +50,7 @@ export default function StudentDataPage() {
   const handleDelete = async (id: string) => {
     if (!confirm('Apakah Anda yakin ingin menghapus data siswa ini?')) return;
     
-    const { error } = await supabase.from('students').delete().eq('id', id);
+    const { error } = await dataService.deleteStudent(id);
     if (error) alert('Gagal menghapus data.');
     else fetchStudents();
   };

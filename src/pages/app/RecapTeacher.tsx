@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase, TeacherAttendance } from '../../lib/supabase';
+import { TeacherAttendance } from '../../lib/supabase';
+import { dataService } from '../../lib/dataService';
 import { motion } from 'motion/react';
-import { Search, Calendar, Download, Filter } from 'lucide-react';
+import { Search, Calendar, Download } from 'lucide-react';
 import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 export default function RecapTeacher() {
   const [recap, setRecap] = useState<(TeacherAttendance & { profiles: { full_name: string } })[]>([]);
@@ -17,13 +17,12 @@ export default function RecapTeacher() {
 
   async function fetchRecap() {
     setLoading(true);
-    const { data } = await supabase
-      .from('teacher_attendance')
-      .select('*, profiles(full_name)')
-      .eq('date', selectedDate)
-      .order('check_in_time', { ascending: false });
+    const { data } = await dataService.getTeacherAttendance();
     
-    if (data) setRecap(data as any);
+    if (data) {
+      const filtered = data.filter((r: any) => r.date === selectedDate);
+      setRecap(filtered as any);
+    }
     setLoading(false);
   }
 

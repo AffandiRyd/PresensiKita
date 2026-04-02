@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { supabase, isDemoMode } from '../lib/supabase';
 import { motion } from 'motion/react';
 import { LogIn, Mail, Lock, AlertCircle } from 'lucide-react';
 
@@ -15,6 +15,21 @@ export default function LoginPage() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+
+    if (isDemoMode) {
+      // Simulate login for demo mode
+      setTimeout(() => {
+        localStorage.setItem('presensikita_demo_user', JSON.stringify({
+          id: 'demo-admin',
+          email: email,
+          full_name: 'Admin Demo',
+          role: 'admin'
+        }));
+        setLoading(false);
+        window.location.reload(); // Reload to trigger App.tsx session check
+      }, 1000);
+      return;
+    }
 
     try {
       const { error } = await supabase.auth.signInWithPassword({

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { supabase, Profile } from '../lib/supabase';
+import { supabase, Profile, isDemoMode } from '../lib/supabase';
 import { cn } from '../lib/utils';
 import { 
   LayoutDashboard, 
@@ -25,6 +25,14 @@ export default function AppLayout() {
 
   useEffect(() => {
     async function getProfile() {
+      if (isDemoMode) {
+        const demoUser = localStorage.getItem('presensikita_demo_user');
+        if (demoUser) {
+          setProfile(JSON.parse(demoUser));
+        }
+        return;
+      }
+
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const { data } = await supabase
@@ -54,6 +62,12 @@ export default function AppLayout() {
   }, []);
 
   const handleLogout = async () => {
+    if (isDemoMode) {
+      localStorage.removeItem('presensikita_demo_user');
+      localStorage.removeItem('presensikita_demo_mode');
+      window.location.reload();
+      return;
+    }
     await supabase.auth.signOut();
     navigate('/');
   };

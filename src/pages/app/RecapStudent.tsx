@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { supabase, StudentAttendance } from '../../lib/supabase';
+import { StudentAttendance } from '../../lib/supabase';
+import { dataService } from '../../lib/dataService';
 import { motion } from 'motion/react';
-import { Search, Calendar, Download, Filter, GraduationCap } from 'lucide-react';
+import { Search, Calendar, Download, Filter } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function RecapStudent() {
@@ -18,16 +19,7 @@ export default function RecapStudent() {
 
   async function fetchRecap() {
     setLoading(true);
-    let query = supabase
-      .from('student_attendance')
-      .select('*, students(name, class_name)')
-      .eq('date', selectedDate);
-    
-    if (selectedClass !== 'Semua') {
-      // This is a bit tricky with Supabase nested filtering, but we can filter client-side or use a join
-    }
-
-    const { data } = await query.order('created_at', { ascending: false });
+    const { data } = await dataService.getStudentAttendance({ date: selectedDate });
     
     if (data) {
       const formattedData = data as any;

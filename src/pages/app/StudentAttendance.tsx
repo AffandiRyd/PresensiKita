@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { supabase, Student, StudentAttendance } from '../../lib/supabase';
+import { Student, isDemoMode } from '../../lib/supabase';
+import { dataService } from '../../lib/dataService';
+import { supabase } from '../../lib/supabase';
 import { motion } from 'motion/react';
-import { Search, Filter, Check, X, AlertCircle, Save } from 'lucide-react';
+import { Search, Filter, AlertCircle, Save } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '../../lib/utils';
 
@@ -18,7 +20,7 @@ export default function StudentAttendancePage() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data: studentData } = await supabase.from('students').select('*').order('name');
+      const { data: studentData } = await dataService.getStudents();
       if (studentData) {
         setStudents(studentData);
         const uniqueClasses = Array.from(new Set(studentData.map(s => s.class_name)));
@@ -27,10 +29,7 @@ export default function StudentAttendancePage() {
       }
 
       // Fetch existing attendance for today
-      const { data: existingAttendance } = await supabase
-        .from('student_attendance')
-        .select('*')
-        .eq('date', today);
+      const { data: existingAttendance } = await dataService.getStudentAttendance({ date: today });
       
       if (existingAttendance) {
         const initialData: Record<string, any> = {};
@@ -51,30 +50,27 @@ export default function StudentAttendancePage() {
 
   const saveAttendance = async () => {
     setSaving(true);
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
+    let userId = '';
+    
+    if (isDemoMode) {
+      const demoUser = localStorage.getItem('presensikita_demo_user');
+      userId = demoUser ? JSON.parse(demoUser).id : 'demo-admin';
+    } else {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      userId = user.id;
+    }
 
     const filteredStudents = students.filter(s => s.class_name === selectedClass);
     const records = filteredStudents.map(s => ({
       student_id: s.id,
-      teacher_id: user.id,
+      teacher_id: userId,
       date: today,
       status: attendanceData[s.id] || 'alfa'
     }));
 
     try {
-      // Delete existing for today and class (simplified approach)
-      const studentIds = filteredStudents.map(s => s.id);
-      await supabase
-        .from('student_attendance')
-        .delete()
-        .eq('date', today)
-        .in('student_id', studentIds);
-
-      const { error } = await supabase
-        .from('student_attendance')
-        .insert(records);
-
+      const { error } = await dataService.upsertStudentAttendance(records);
       if (error) throw error;
       alert('Absensi berhasil disimpan!');
     } catch (err) {

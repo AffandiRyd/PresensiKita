@@ -18,6 +18,10 @@ export default function App() {
 
   useEffect(() => {
     if (!isConfigured) {
+      const demoUser = localStorage.getItem('presensikita_demo_user');
+      if (demoUser) {
+        setSession({ user: JSON.parse(demoUser) });
+      }
       setLoading(false);
       return;
     }
