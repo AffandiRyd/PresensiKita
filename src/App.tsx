@@ -25,6 +25,22 @@ export default function App() {
 
     const initSession = async () => {
       try {
+        // Check for URL mismatch if it's a Supabase JWT
+        try {
+          const key = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
+          if (key && key.includes('.')) {
+            const payload = JSON.parse(atob(key.split('.')[1]));
+            const url = import.meta.env.VITE_SUPABASE_URL || '';
+            if (payload.ref && !url.includes(payload.ref)) {
+              setConnectionError(`URL Mismatch: Kunci Anda untuk proyek "${payload.ref}", tapi URL Anda adalah "${url}".`);
+              setLoading(false);
+              return;
+            }
+          }
+        } catch (e) {
+          console.warn('JWT check failed', e);
+        }
+
         const { data: { session }, error } = await supabase.auth.getSession();
         if (error) throw error;
         setSession(session);

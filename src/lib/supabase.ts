@@ -6,8 +6,13 @@ const rawKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 // Smart URL formatting
 let supabaseUrl = rawUrl.trim().replace(/\/$/, '');
 if (supabaseUrl && !supabaseUrl.startsWith('http')) {
-  // If user just pasted the project ref (e.g. muwygzawxeqvrlgfpppo)
-  supabaseUrl = `https://${supabaseUrl}.supabase.co`;
+  // If user pasted something like "muwygzawxeqvrlgfpppo.supabase.co"
+  if (supabaseUrl.includes('.supabase.co')) {
+    supabaseUrl = `https://${supabaseUrl}`;
+  } else {
+    // If user just pasted the project ref (e.g. muwygzawxeqvrlgfpppo)
+    supabaseUrl = `https://${supabaseUrl}.supabase.co`;
+  }
 }
 
 const supabaseAnonKey = rawKey.trim();
