@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Student, isDemoMode } from '../../lib/supabase';
+import { Student } from '../../lib/supabase';
 import { dataService } from '../../lib/dataService';
 import { supabase } from '../../lib/supabase';
 import { motion } from 'motion/react';
@@ -50,21 +50,13 @@ export default function StudentAttendancePage() {
 
   const saveAttendance = async () => {
     setSaving(true);
-    let userId = '';
-    
-    if (isDemoMode) {
-      const demoUser = localStorage.getItem('presensikita_demo_user');
-      userId = demoUser ? JSON.parse(demoUser).id : 'demo-admin';
-    } else {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      userId = user.id;
-    }
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
 
     const filteredStudents = students.filter(s => s.class_name === selectedClass);
     const records = filteredStudents.map(s => ({
       student_id: s.id,
-      teacher_id: userId,
+      teacher_id: user.id,
       date: today,
       status: attendanceData[s.id] || 'alfa'
     }));

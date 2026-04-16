@@ -16,18 +16,16 @@ const isConfigured = Boolean(
   supabaseUrl && 
   supabaseAnonKey && 
   !supabaseUrl.includes('placeholder') &&
-  supabaseUrl.includes('.supabase.co')
+  supabaseUrl.includes('.supabase.co') &&
+  !supabaseAnonKey.includes('sb_publishable')
 );
-
-// Check if user explicitly wants demo mode
-const isDemoMode = !isConfigured && localStorage.getItem('presensikita_demo_mode') === 'true';
 
 export const supabase = createClient(
   supabaseUrl || 'https://placeholder-project.supabase.co',
   supabaseAnonKey || 'placeholder-key'
 );
 
-export { isConfigured, isDemoMode };
+export { isConfigured };
 
 export type Profile = {
   id: string;
