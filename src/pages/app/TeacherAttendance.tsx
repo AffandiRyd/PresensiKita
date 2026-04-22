@@ -52,10 +52,10 @@ export default function TeacherAttendancePage() {
   if (loading) return <div className="animate-pulse space-y-4"><div className="h-12 bg-slate-200 rounded-xl w-1/4"></div><div className="h-64 bg-slate-200 rounded-2xl"></div></div>;
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <header>
-        <h1 className="text-2xl font-bold text-slate-900">Absensi Guru & Staff</h1>
-        <p className="text-slate-500">Lakukan absensi mandiri harian Anda di sini.</p>
+    <div className="max-w-4xl mx-auto space-y-10">
+      <header className="mb-10 lg:text-center">
+        <h1 className="text-3xl font-display font-extrabold text-slate-900 tracking-tight">Absensi Guru & Staff</h1>
+        <p className="text-slate-500 font-medium mt-1">Lakukan absensi mandiri harian Anda di sini.</p>
       </header>
 
       <motion.div 

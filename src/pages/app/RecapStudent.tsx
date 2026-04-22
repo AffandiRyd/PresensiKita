@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { StudentAttendance } from '../../lib/supabase';
 import { dataService } from '../../lib/dataService';
 import { motion } from 'motion/react';
-import { Search, Calendar, Download, Filter } from 'lucide-react';
+import { Search, Calendar, Download, Filter, ClipboardList } from 'lucide-react';
 import { format } from 'date-fns';
 
 export default function RecapStudent() {
@@ -51,83 +51,111 @@ export default function RecapStudent() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Rekap Absensi Siswa</h1>
-          <p className="text-slate-500">Laporan kehadiran siswa harian per kelas.</p>
+          <h1 className="text-3xl font-display font-extrabold text-slate-900 tracking-tight">Rekap Absensi Siswa</h1>
+          <p className="text-slate-500 font-medium">Laporan kehadiran siswa harian per kelas.</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-xl font-bold hover:bg-slate-50 transition-all shadow-sm">
-          <Download className="w-5 h-5" />
+        <button className="flex items-center justify-center gap-3 px-6 py-4 bg-white border border-slate-100 text-slate-600 rounded-2xl font-bold hover:bg-brand-primary hover:text-white transition-all shadow-sm hover:shadow-premium group">
+          <Download className="w-5 h-5 group-hover:scale-110 transition-transform" />
           Ekspor Excel
         </button>
       </header>
 
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+      <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-slate-100 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="relative group">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-brand-primary transition-colors" />
             <input 
               type="text"
               placeholder="Cari nama siswa..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-light outline-none"
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary outline-none transition-all font-medium"
             />
           </div>
-          <div className="flex items-center gap-2">
-            <Filter className="w-5 h-5 text-slate-400" />
+          <div className="flex items-center gap-2 relative group">
+            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <select
               value={selectedClass}
               onChange={(e) => setSelectedClass(e.target.value)}
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-light outline-none"
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary outline-none transition-all font-medium appearance-none"
             >
               {classes.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
           </div>
-          <div className="flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-slate-400" />
+          <div className="flex items-center gap-2 relative group">
+            <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <input 
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-light outline-none"
+              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl focus:ring-4 focus:ring-brand-primary/5 focus:border-brand-primary outline-none transition-all font-medium"
             />
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100">
-                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider">Nama Siswa</th>
-                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider">Kelas</th>
-                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider">Waktu Input</th>
+                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider font-display">Nama Siswa</th>
+                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider font-display">Kelas</th>
+                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider font-display">Status</th>
+                <th className="py-4 px-4 text-sm font-bold text-slate-500 uppercase tracking-wider font-display">Waktu Input</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {loading ? (
-                <tr><td colSpan={4} className="py-8 text-center text-slate-400">Memuat data...</td></tr>
+                <tr><td colSpan={4} className="py-8 text-center text-slate-400 italic">Memuat data...</td></tr>
               ) : filteredRecap.map((row) => (
                 <tr key={row.id} className="hover:bg-slate-50 transition-colors">
                   <td className="py-4 px-4 text-sm font-bold text-slate-900">{row.students.name}</td>
                   <td className="py-4 px-4">
-                    <span className="text-xs font-medium px-2 py-1 bg-slate-100 rounded-md text-slate-600">
+                    <span className="text-[10px] font-black px-2 py-1 bg-brand-primary/10 text-brand-primary rounded-md uppercase tracking-tight">
                       {row.students.class_name}
                     </span>
                   </td>
                   <td className="py-4 px-4">{getStatusBadge(row.status)}</td>
-                  <td className="py-4 px-4 text-sm text-slate-500">
+                  <td className="py-4 px-4 text-sm text-slate-500 font-mono">
                     {format(new Date(row.created_at), 'HH:mm')}
                   </td>
                 </tr>
               ))}
-              {!loading && filteredRecap.length === 0 && (
-                <tr><td colSpan={4} className="py-12 text-center text-slate-500">Tidak ada data absensi siswa untuk kriteria ini.</td></tr>
-              )}
             </tbody>
           </table>
         </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+          {loading ? (
+            <div className="py-8 text-center text-slate-400 italic">Memuat data...</div>
+          ) : filteredRecap.map((row) => (
+            <div key={row.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+              <div>
+                <p className="text-base font-bold text-slate-900 leading-tight mb-1">{row.students.name}</p>
+                <div className="flex items-center gap-2">
+                   <span className="text-[10px] font-black px-2 py-0.5 bg-brand-primary/5 text-brand-primary rounded-md uppercase tracking-tight">
+                      {row.students.class_name}
+                    </span>
+                    <span className="text-[10px] font-bold text-slate-400 font-mono">
+                      {format(new Date(row.created_at), 'HH:mm')}
+                    </span>
+                </div>
+              </div>
+              <div>{getStatusBadge(row.status)}</div>
+            </div>
+          ))}
+        </div>
+
+        {!loading && filteredRecap.length === 0 && (
+          <div className="py-20 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-50 rounded-full mb-4">
+              <ClipboardList className="w-10 h-10 text-slate-200" />
+            </div>
+            <p className="text-slate-500 font-medium">Tidak ada data absensi ditemukan.</p>
+          </div>
+        )}
       </div>
     </div>
   );

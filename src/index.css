@@ -1,23 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-brand-dark: #1e3a8a;
-  --color-brand-light: #3b82f6;
+  --font-display: "Outfit", sans-serif;
+  --color-brand-dark: #1e1b4b;
+  --color-brand-primary: #4f46e5;
+  --color-brand-light: #818cf8;
+  --color-brand-accent: #f43f5e;
   --color-brand-sky: #0ea5e9;
+  
+  --shadow-premium: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-premium-dark: 0 25px 50px -12px rgb(0 0 0 / 0.5);
+  --shadow-inner-border: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
 }
 
 @layer base {
   body {
-    @apply font-sans antialiased text-slate-900 bg-slate-50;
+    @apply font-sans antialiased text-slate-900 bg-[#fbfbfd];
   }
 }
 
 .bg-gradient-brand {
-  @apply bg-gradient-to-br from-brand-dark to-brand-light;
+  @apply bg-gradient-to-br from-brand-dark via-brand-primary to-brand-light;
 }
 
 .text-gradient-brand {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-dark to-brand-light;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-dark via-brand-primary to-brand-light;
+}
+
+.glass-morphism {
+  @apply bg-white/70 backdrop-blur-md border border-white/20;
 }
 

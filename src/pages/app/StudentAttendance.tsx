@@ -82,17 +82,17 @@ export default function StudentAttendancePage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Absensi Siswa</h1>
-          <p className="text-slate-500">Kelola kehadiran siswa kelas {selectedClass} hari ini.</p>
+          <h1 className="text-3xl font-display font-extrabold text-slate-900 tracking-tight">Absensi Siswa</h1>
+          <p className="text-slate-500 font-medium">Kelola kehadiran siswa kelas <span className="text-brand-primary font-bold">{selectedClass}</span> hari ini.</p>
         </div>
         <button
           onClick={saveAttendance}
           disabled={saving || filteredStudents.length === 0}
-          className="flex items-center gap-2 px-6 py-3 bg-brand-dark text-white rounded-xl font-bold hover:bg-brand-light transition-all shadow-md disabled:opacity-50"
+          className="flex items-center justify-center gap-3 px-8 py-4 bg-brand-dark text-white rounded-2xl font-bold hover:bg-brand-primary transition-all shadow-xl hover:shadow-brand-primary/20 disabled:opacity-50 active:scale-95 group"
         >
-          <Save className="w-5 h-5" />
+          <Save className="w-5 h-5 group-hover:scale-110 transition-transform" />
           {saving ? 'Menyimpan...' : 'Simpan Absensi'}
         </button>
       </header>
@@ -121,7 +121,7 @@ export default function StudentAttendancePage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100">
@@ -142,38 +142,78 @@ export default function StudentAttendancePage() {
                         { id: 'izin', label: 'I', color: 'amber' },
                         { id: 'sakit', label: 'S', color: 'blue' },
                         { id: 'alfa', label: 'A', color: 'red' },
-                      ].map((status) => (
-                        <button
-                          key={status.id}
-                          onClick={() => handleStatusChange(student.id, status.id as any)}
-                          title={status.id.toUpperCase()}
-                          className={cn(
-                            "w-10 h-10 rounded-lg font-bold transition-all border-2",
-                            attendanceData[student.id] === status.id
-                              ? `bg-${status.color}-500 border-${status.color}-600 text-white shadow-md scale-110`
-                              : `bg-white border-slate-200 text-slate-400 hover:border-${status.color}-300 hover:text-${status.color}-500`
-                          )}
-                        >
-                          {status.label}
-                        </button>
-                      ))}
+                      ].map((status) => {
+                        const isSelected = attendanceData[student.id] === status.id;
+                        return (
+                          <button
+                            key={status.id}
+                            onClick={() => handleStatusChange(student.id, status.id as any)}
+                            title={status.id.toUpperCase()}
+                            className={cn(
+                              "w-10 h-10 rounded-lg font-bold transition-all border-2",
+                              isSelected
+                                ? `bg-${status.color}-500 border-${status.color}-600 text-white shadow-md scale-110`
+                                : `bg-white border-slate-100 text-slate-400 hover:border-${status.color}-300 hover:text-${status.color}-500`
+                            )}
+                          >
+                            {status.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </td>
                 </tr>
               ))}
-              {filteredStudents.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="py-12 text-center text-slate-500">
-                    <div className="flex flex-col items-center gap-2">
-                      <AlertCircle className="w-8 h-8 text-slate-300" />
-                      <p>Tidak ada data siswa ditemukan.</p>
-                    </div>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+          {filteredStudents.map((student) => (
+            <div key={student.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">{student.nism}</p>
+                  <p className="text-lg font-bold text-slate-900">{student.name}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {[
+                  { id: 'hadir', label: 'Hadir', color: 'emerald' },
+                  { id: 'izin', label: 'Izin', color: 'amber' },
+                  { id: 'sakit', label: 'Sakit', color: 'blue' },
+                  { id: 'alfa', label: 'Alfa', color: 'red' },
+                ].map((status) => {
+                  const isSelected = attendanceData[student.id] === status.id;
+                  return (
+                    <button
+                      key={status.id}
+                      onClick={() => handleStatusChange(student.id, status.id as any)}
+                      className={cn(
+                        "flex-1 py-3 rounded-xl font-bold text-xs transition-all border-2",
+                        isSelected
+                          ? `bg-${status.color}-500 border-${status.color}-600 text-white shadow-md`
+                          : `bg-white border-slate-100 text-slate-400`
+                      )}
+                    >
+                      {status.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredStudents.length === 0 && (
+          <div className="py-12 text-center text-slate-500">
+            <div className="flex flex-col items-center gap-2">
+              <AlertCircle className="w-8 h-8 text-slate-300" />
+              <p className="font-medium">Tidak ada data siswa ditemukan.</p>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

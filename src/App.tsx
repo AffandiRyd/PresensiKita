@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useEffect, useState } from 'react';
 import { supabase, isConfigured } from './lib/supabase';
 import { Settings, AlertCircle, Database } from 'lucide-react';
+import { motion } from 'motion/react';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import AppLayout from './components/AppLayout';
@@ -63,47 +64,62 @@ export default function App() {
 
   if (!isConfigured || connectionError) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-6">
-        <div className="max-w-md w-full bg-white p-8 rounded-3xl shadow-xl border border-slate-100 text-center">
-          <div className="w-16 h-16 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
-            <Database className="w-8 h-8" />
+      <div className="min-h-screen bg-[#fbfbfd] flex items-center justify-center p-6 lg:p-12 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-brand-primary/5 blur-[120px] rounded-full -z-10"></div>
+        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-brand-accent/5 blur-[100px] rounded-full -z-10"></div>
+
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-xl w-full bg-white p-10 md:p-12 rounded-[2.5rem] shadow-premium border border-slate-100 relative"
+        >
+          <div className="w-20 h-20 bg-rose-50 text-rose-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-inner-border">
+            <Database className="w-10 h-10" />
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 mb-2">
-            {connectionError ? 'Koneksi Gagal' : 'Database Belum Terhubung'}
+          <h1 className="text-3xl md:text-4xl font-display font-extrabold text-slate-900 mb-4 tracking-tight text-center">
+            {connectionError ? 'Koneksi Terputus' : 'Konfigurasi Diperlukan'}
           </h1>
-          <p className="text-slate-600 mb-6">
+          <p className="text-slate-500 font-medium mb-10 text-center leading-relaxed">
             {connectionError 
-              ? `Terjadi kesalahan saat menghubungi Supabase: "${connectionError}". Periksa kembali kredensial Anda.`
-              : 'Error "Failed to fetch" terjadi karena aplikasi tidak dapat menghubungi server Supabase. Anda perlu mengatur kredensial yang benar di panel Secrets AI Studio.'}
+              ? `Kami mendeteksi masalah pada koneksi Supabase Anda: "${connectionError}". Silakan periksa kredensial di panel Secrets.`
+              : 'Sistem membutuhkan koneksi database Supabase yang valid untuk berfungsi. Harap atur VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY.'}
           </p>
           
-          <div className="space-y-4 text-left">
-            <div className="p-4 bg-amber-50 border border-amber-100 rounded-xl flex gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <div className="text-sm text-amber-800">
-                <p className="font-bold mb-1">Tips Perbaikan:</p>
-                <ul className="list-disc pl-4 space-y-1">
-                  <li>Pastikan <strong>VITE_SUPABASE_URL</strong> berformat <code>https://xyz.supabase.co</code></li>
-                  <li>Pastikan <strong>VITE_SUPABASE_ANON_KEY</strong> adalah kunci "anon public", bukan "service role"</li>
-                  <li>Pastikan proyek Supabase Anda tidak sedang dalam status "Paused"</li>
+          <div className="space-y-6">
+            <div className="p-6 bg-amber-50 border border-amber-100 rounded-3xl flex gap-4">
+              <AlertCircle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+              <div className="text-sm font-medium">
+                <p className="font-extrabold text-amber-900 mb-2 uppercase tracking-widest text-[10px]">Langkah Perbaikan:</p>
+                <ul className="text-amber-800/80 space-y-2 list-disc pl-4 leading-relaxed">
+                  <li>Gunakan URL berformat <code className="bg-white/50 px-1 rounded">https://[ID].supabase.co</code></li>
+                  <li>Pastikan Anda menyalin "anon public key" dengan benar</li>
+                  <li>Pastikan status proyek Anda "Active" di dashboard Supabase</li>
                 </ul>
               </div>
             </div>
 
-            <div className="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-100 text-sm font-mono">
-              <p className="text-slate-500"># Cek di Secrets:</p>
-              <p className="text-brand-dark">VITE_SUPABASE_URL=...</p>
-              <p className="text-brand-dark">VITE_SUPABASE_ANON_KEY=...</p>
+            <div className="p-6 bg-slate-50 rounded-3xl border border-slate-100">
+               <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">Required Secrets:</p>
+               <div className="space-y-3 font-mono text-xs">
+                  <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100">
+                    <span className="text-slate-400">URL</span>
+                    <span className="text-brand-primary font-bold">VITE_SUPABASE_URL</span>
+                  </div>
+                  <div className="flex items-center justify-between p-3 bg-white rounded-xl border border-slate-100">
+                    <span className="text-slate-400">KEY</span>
+                    <span className="text-brand-primary font-bold">VITE_SUPABASE_ANON_KEY</span>
+                  </div>
+               </div>
             </div>
 
             <button 
               onClick={() => window.location.reload()}
-              className="w-full py-3 bg-brand-dark text-white rounded-xl font-bold hover:bg-brand-light transition-all shadow-md"
+              className="w-full py-5 bg-brand-dark text-white rounded-2xl font-bold hover:bg-brand-primary transition-all shadow-xl hover:shadow-brand-primary/20 active:scale-95"
             >
-              Coba Lagi
+              Segarkan Halaman
             </button>
           </div>
-        </div>
+        </motion.div>
       </div>
     );
   }

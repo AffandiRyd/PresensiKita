@@ -63,10 +63,10 @@ export default function StudentDataPage() {
 
   return (
     <div className="space-y-6">
-      <header className="flex items-center justify-between">
+      <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Data Siswa</h1>
-          <p className="text-slate-500">Kelola daftar siswa yang terdaftar di sistem.</p>
+          <h1 className="text-3xl font-display font-extrabold text-slate-900 tracking-tight">Data Siswa</h1>
+          <p className="text-slate-500 font-medium">Kelola daftar siswa yang terdaftar di sistem.</p>
         </div>
         <button
           onClick={() => {
@@ -74,7 +74,7 @@ export default function StudentDataPage() {
             setFormData({ nism: '', name: '', class_name: '' });
             setIsModalOpen(true);
           }}
-          className="flex items-center gap-2 px-6 py-3 bg-brand-dark text-white rounded-xl font-bold hover:bg-brand-light transition-all shadow-md"
+          className="flex items-center justify-center gap-2 px-6 py-4 bg-brand-dark text-white rounded-2xl font-bold hover:bg-brand-primary transition-all shadow-xl hover:shadow-brand-primary/20 active:scale-95"
         >
           <Plus className="w-5 h-5" />
           Tambah Siswa
@@ -93,7 +93,7 @@ export default function StudentDataPage() {
           />
         </div>
 
-        <div className="overflow-x-auto">
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-slate-100">
@@ -109,7 +109,7 @@ export default function StudentDataPage() {
                   <td className="py-4 px-4 text-sm font-medium text-slate-600">{student.nism}</td>
                   <td className="py-4 px-4 text-sm font-bold text-slate-900">{student.name}</td>
                   <td className="py-4 px-4">
-                    <span className="px-3 py-1 bg-blue-50 text-brand-dark rounded-full text-xs font-bold">
+                    <span className="px-3 py-1 bg-brand-primary/10 text-brand-primary rounded-lg text-[10px] font-black uppercase tracking-widest">
                       {student.class_name}
                     </span>
                   </td>
@@ -121,13 +121,13 @@ export default function StudentDataPage() {
                           setFormData({ nism: student.nism, name: student.name, class_name: student.class_name });
                           setIsModalOpen(true);
                         }}
-                        className="p-2 text-slate-400 hover:text-brand-dark hover:bg-blue-50 rounded-lg transition-all"
+                        className="p-2 text-slate-400 hover:text-brand-primary hover:bg-brand-primary/5 rounded-xl transition-all"
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
                       <button 
                         onClick={() => handleDelete(student.id)}
-                        className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -138,6 +138,48 @@ export default function StudentDataPage() {
             </tbody>
           </table>
         </div>
+
+        {/* Mobile View */}
+        <div className="md:hidden space-y-4">
+          {filteredStudents.map((student) => (
+            <div key={student.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+              <div>
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{student.nism}</p>
+                <p className="text-base font-bold text-slate-900 leading-tight">{student.name}</p>
+                <div className="mt-2 text-[10px] font-black text-brand-primary uppercase tracking-widest bg-brand-primary/5 px-2 py-0.5 rounded-md inline-block">
+                  {student.class_name}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => {
+                    setEditingStudent(student);
+                    setFormData({ nism: student.nism, name: student.name, class_name: student.class_name });
+                    setIsModalOpen(true);
+                  }}
+                  className="p-3 text-brand-primary bg-white border border-slate-100 rounded-xl shadow-sm"
+                >
+                  <Edit2 className="w-4 h-4" />
+                </button>
+                <button 
+                  onClick={() => handleDelete(student.id)}
+                  className="p-3 text-rose-600 bg-white border border-slate-100 rounded-xl shadow-sm"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {filteredStudents.length === 0 && !loading && (
+          <div className="py-20 text-center">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-slate-50 rounded-full mb-4">
+              <Search className="w-10 h-10 text-slate-200" />
+            </div>
+            <p className="text-slate-500 font-medium">Tidak ada data siswa ditemukan.</p>
+          </div>
+        )}
       </div>
 
       {/* Modal */}
