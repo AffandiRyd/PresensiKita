@@ -43,11 +43,24 @@ export default function App() {
         }
 
         const { data: { session }, error } = await supabase.auth.getSession();
-        if (error) throw error;
-        setSession(session);
+        
+        if (error) {
+          // If the error is about an invalid refresh token, just sign out to clear it
+          if (error.message.includes('Refresh Token Not Found') || error.message.includes('refresh_token_not_found')) {
+            await supabase.auth.signOut();
+            setSession(null);
+          } else {
+            throw error;
+          }
+        } else {
+          setSession(session);
+        }
       } catch (err: any) {
         console.error('Supabase connection error:', err);
-        setConnectionError(err.message || 'Gagal terhubung ke Supabase');
+        // Only set connection error if it's not a session-related error
+        if (!err.message?.includes('Refresh Token')) {
+          setConnectionError(err.message || 'Gagal terhubung ke Supabase');
+        }
       } finally {
         setLoading(false);
       }
